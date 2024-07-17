@@ -1,13 +1,3 @@
 # replai
 
-Install dependencies
-
-```shell
-bun install
-```
-
-Environment variables
-
-```env
-OPENAI_API_KEY
-```
+A 'Hello World' chat bot using OpenAI optimised for use in the terminal.
