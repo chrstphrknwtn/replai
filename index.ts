@@ -10,8 +10,8 @@ const config = {
   You're a general assistant in a unix-like shell environment.
   You will use double paragraph breaks often to aid reading.
   If you are asked about code avoid showing dependency installation steps,
-  and do not explain basic coding concepts. When showing code examples never
-  use markdown syntax.`,
+  and do not explain basic coding concepts.
+  Do not use markdown syntax in your responses.`,
   columns: 72
 }
 
@@ -38,6 +38,7 @@ async function main() {
       stream: true
     })
 
+    let response = ''
     process.stdout.write('\n')
     let currLineLength = 0
     for await (const chunk of stream) {
@@ -46,12 +47,13 @@ async function main() {
       if (content) {
         if (
           currLineLength + content.length > config.columns &&
-          process.stdout.columns > config.columns
+          process.stdout.columns > config.columns &&
+          content.length > 2
         ) {
           process.stdout.write('\n')
           currLineLength = 0
           // Trim space character after inserting newline
-          process.stdout.write(content.slice(1))
+          process.stdout.write(content[0] === ' ' ? content.slice(1) : content)
         } else {
           process.stdout.write(content)
         }
@@ -60,6 +62,10 @@ async function main() {
           currLineLength = 0
         }
         currLineLength += content.length
+
+        // Update chat history
+        response += content
+        messages.push({ role: 'assistant', content: response })
       }
     }
     process.stdout.write('\n\n')
